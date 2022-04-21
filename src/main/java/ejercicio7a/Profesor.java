@@ -157,7 +157,9 @@ public class Profesor {
     //ToString
     @Override
     public String toString() {
-        return nombre + "," + dni + "," + puesto + "," + fechaToma + "," + fechaCese + "," + telf + "," + evaluador + "," + coordinador;
+        return nombre + "\t" + dni + "\t" + puesto + "\t" + fechaToma
+                + "\t" + fechaCese + "\t" + telf + "\t" + evaluador
+                + "\t" + coordinador;
     }
 
 }

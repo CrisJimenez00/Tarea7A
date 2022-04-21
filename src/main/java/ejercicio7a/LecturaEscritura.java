@@ -4,12 +4,18 @@
  */
 package ejercicio7a;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.TreeMap;
 
 /**
  *
@@ -17,19 +23,38 @@ import java.util.Scanner;
  */
 public class LecturaEscritura {
 
+    //Método el cual quita las comillas del principio y el final de la palabra
     private static String comilla(String s) {
         String quitar = s.substring(1, s.length() - 1);
         return quitar;
     }
 
-    private static void lectura() {
+    //Metodo el cual mapea un ArrayList
+    private static Map<String, Integer> mapear(ArrayList<Profesor> lista) {
+        Map<String, Integer> listaProfesores = new HashMap();
+        int contadorDepartamento = 1;
+        for (Profesor profesor : lista) {
+            if (listaProfesores.containsKey(profesor.getPuesto())) {
+                contadorDepartamento++;
+                listaProfesores.put(profesor.getPuesto(), contadorDepartamento);
+            } else {
+                contadorDepartamento = 1;
+                listaProfesores.put(profesor.getPuesto(), contadorDepartamento);
+
+            }
+        }
+
+        return listaProfesores;
+    }
+
+    //Método el cual lee un csv y lo mete en un ArrayList
+    private static ArrayList<Profesor> lectura() {
         // Fichero a leer con datos de ejemplo
         String idFichero = "RelPerCen.csv";
 
         // Variables para guardar los datos que se van leyendo
         String[] tokens;
         String linea;
-        int contador = 0;
 
         ArrayList<Profesor> lista = new ArrayList<>();
 
@@ -79,19 +104,60 @@ public class LecturaEscritura {
                 }
 
                 lista.add(p1);
-                System.out.println(p1.toString());
-                contador++;
             }
-            System.out.println("\n\nHay un total de: " + contador + " profesores");
+
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         }
+        return lista;
 
     }
 
-    public static void main(String[] args) {
-        lectura();
+    private static void escrituraLista(Map<String, Integer> listita) {
 
+        ArrayList<Profesor> lista = lectura();
+        listita = new TreeMap<>();
+        listita = mapear(lista);
+        // Fichero a crear. Ruta relativa a la carpeta raíz del proyecto
+        Scanner teclado = new Scanner(System.in);
+        String idFichero = "profesoresPorDepartamento.csv";
+        String tmp;
+
+        // Si se utiliza el constructor FileWriter(idFichero, true) entonces se anexa información
+        // al final del fichero idFichero
+        // Estructura try-with-resources. Instancia el objeto con el fichero a escribir
+        // y se encarga de cerrar el recurso "flujo" una vez finalizadas las operaciones
+        try ( BufferedWriter flujo = new BufferedWriter(new FileWriter(idFichero))) {
+            flujo.write("Departamentos\tNúmero");
+            flujo.newLine();
+            for (String key : listita.keySet()) {
+                flujo.write(key + " \t " + listita.get(key));
+                flujo.newLine();
+            }
+
+            // Metodo fluh() guarda cambios en disco 
+            flujo.flush();
+            System.out.println("Fichero " + idFichero + " creado correctamente.");
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+        ArrayList<Profesor> lista = lectura();
+        Map<String, Integer> mapProfes = new HashMap<>();
+        mapProfes = mapear(lista);
+
+        int contador = 0;
+
+        for (Profesor profesor : lista) {
+            System.out.println(profesor.toString());
+            contador++;
+        }
+
+        System.out.println("\n\nHay un total de: " + contador + " profesores");
+
+        escrituraLista(mapProfes);
 //        Collections.sort(listaVehiculo);
 //        for (Vehiculo lista : listaVehiculo) {
 //            System.out.println(lista);
