@@ -11,6 +11,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +30,7 @@ public class LecturaEscritura {
         return quitar;
     }
 
-    //Metodo el cual mapea un ArrayList
+    //Metodo el cual mapea un ArrayList y cuenta los profesores según los departamentos
     private static Map<String, Integer> mapear(ArrayList<Profesor> lista) {
         Map<String, Integer> listaProfesores = new HashMap();
         int contadorDepartamento = 1;
@@ -63,7 +64,7 @@ public class LecturaEscritura {
         // Inicialización del flujo "datosFichero" en función del archivo llamado "idFichero"
         // Estructura try-with-resources. Permite cerrar los recursos una vez finalizadas
         // las operaciones con el archivo
-        try ( Scanner datosFichero = new Scanner(new File(idFichero), "ISO-8859-1")) {
+        try (Scanner datosFichero = new Scanner(new File(idFichero), "ISO-8859-1")) {
 
             datosFichero.nextLine();
 
@@ -113,7 +114,7 @@ public class LecturaEscritura {
 
     }
 
-    private static void escrituraLista(Map<String, Integer> listita) {
+    private static void escrituraMapeo(Map<String, Integer> listita) {
 
         ArrayList<Profesor> lista = lectura();
         listita = new TreeMap<>();
@@ -127,12 +128,57 @@ public class LecturaEscritura {
         // al final del fichero idFichero
         // Estructura try-with-resources. Instancia el objeto con el fichero a escribir
         // y se encarga de cerrar el recurso "flujo" una vez finalizadas las operaciones
-        try ( BufferedWriter flujo = new BufferedWriter(new FileWriter(idFichero))) {
+        try (BufferedWriter flujo = new BufferedWriter(new FileWriter(idFichero))) {
             flujo.write("Departamentos\tNúmero");
             flujo.newLine();
             for (String key : listita.keySet()) {
                 flujo.write(key + " \t " + listita.get(key));
                 flujo.newLine();
+            }
+
+            // Metodo fluh() guarda cambios en disco 
+            flujo.flush();
+            System.out.println("Fichero " + idFichero + " creado correctamente.");
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    //Devuelve del nº de día entre una fecha y otra
+    public static long diaEntreFechas(LocalDate ini, LocalDate fin) {
+
+        //Restamos
+        long resultado = ChronoUnit.DAYS.between(ini, fin);
+
+        //Devolvemos el resultado
+        return resultado;
+    }
+
+    //Metodo el cual crea el csv de los profesores que llevan más de 100 días trabajando
+    private static void escrituraListaAntiguedad(ArrayList<Profesor> lista) {
+
+        lista = lectura();
+        LocalDate fechaini = LocalDate.of(2020, 1, 1);
+        LocalDate fechafin = LocalDate.of(2021, 12, 31);
+        // Fichero a crear. Ruta relativa a la carpeta raíz del proyecto
+        Scanner teclado = new Scanner(System.in);
+        String idFichero = "profesoresAntiguos.csv";
+        String tmp;
+
+        // Si se utiliza el constructor FileWriter(idFichero, true) entonces se anexa información
+        // al final del fichero idFichero
+        // Estructura try-with-resources. Instancia el objeto con el fichero a escribir
+        // y se encarga de cerrar el recurso "flujo" una vez finalizadas las operaciones
+        try (BufferedWriter flujo = new BufferedWriter(new FileWriter(idFichero))) {
+            flujo.write("Nombre\tDNI/Pasaporte\tPuesto\tFecha de Toma\tFecha de Cese\tTeléfono\tEvaluador\tCoodinador");
+            flujo.newLine();
+            for (Profesor profesor : lista) {
+                if (profesor.getFechaToma().isAfter(fechaini) && profesor.getFechaCese().isBefore(fechafin)) {
+                    if (diaEntreFechas(profesor.getFechaToma(), profesor.getFechaCese()) >= 100) {
+                        flujo.write(profesor.toString());
+                        flujo.newLine();
+                    }
+                }
             }
 
             // Metodo fluh() guarda cambios en disco 
@@ -157,11 +203,7 @@ public class LecturaEscritura {
 
         System.out.println("\n\nHay un total de: " + contador + " profesores");
 
-        escrituraLista(mapProfes);
-//        Collections.sort(listaVehiculo);
-//        for (Vehiculo lista : listaVehiculo) {
-//            System.out.println(lista);
-//
-//        }
+        escrituraMapeo(mapProfes);
+        escrituraListaAntiguedad(lista);
     }
 }
