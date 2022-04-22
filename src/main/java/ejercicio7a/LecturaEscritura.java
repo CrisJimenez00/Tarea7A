@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -64,7 +65,7 @@ public class LecturaEscritura {
         // Inicialización del flujo "datosFichero" en función del archivo llamado "idFichero"
         // Estructura try-with-resources. Permite cerrar los recursos una vez finalizadas
         // las operaciones con el archivo
-        try (Scanner datosFichero = new Scanner(new File(idFichero), "ISO-8859-1")) {
+        try ( Scanner datosFichero = new Scanner(new File(idFichero), "ISO-8859-1")) {
 
             datosFichero.nextLine();
 
@@ -77,7 +78,7 @@ public class LecturaEscritura {
                 tokens = linea.split(",");
                 Profesor p1 = new Profesor();
 
-                p1.setNombre(comilla(tokens[0] + tokens[1]));
+                p1.setNombre(comilla(tokens[1]) + " " + tokens[0].substring(1));
                 p1.setDni(comilla(tokens[2]));
                 p1.setPuesto(comilla(tokens[3]));
 
@@ -103,7 +104,6 @@ public class LecturaEscritura {
                 } else {
                     p1.setCoordinador(true);
                 }
-
                 lista.add(p1);
             }
 
@@ -128,7 +128,7 @@ public class LecturaEscritura {
         // al final del fichero idFichero
         // Estructura try-with-resources. Instancia el objeto con el fichero a escribir
         // y se encarga de cerrar el recurso "flujo" una vez finalizadas las operaciones
-        try (BufferedWriter flujo = new BufferedWriter(new FileWriter(idFichero))) {
+        try ( BufferedWriter flujo = new BufferedWriter(new FileWriter(idFichero))) {
             flujo.write("Departamentos\tNúmero");
             flujo.newLine();
             for (String key : listita.keySet()) {
@@ -169,7 +169,7 @@ public class LecturaEscritura {
         // al final del fichero idFichero
         // Estructura try-with-resources. Instancia el objeto con el fichero a escribir
         // y se encarga de cerrar el recurso "flujo" una vez finalizadas las operaciones
-        try (BufferedWriter flujo = new BufferedWriter(new FileWriter(idFichero))) {
+        try ( BufferedWriter flujo = new BufferedWriter(new FileWriter(idFichero))) {
             flujo.write("Nombre\tDNI/Pasaporte\tPuesto\tFecha de Toma\tFecha de Cese\tTeléfono\tEvaluador\tCoodinador");
             flujo.newLine();
             for (Profesor profesor : lista) {
@@ -190,10 +190,19 @@ public class LecturaEscritura {
     }
 
     public static void main(String[] args) {
+        //Lista para los profesores con cierta letra en su dni
+        ArrayList<String> listaLetraDni = new ArrayList<>();
+        //Lista que guarda a los que han tenido la fecha de toma en ese tiempo
+        ArrayList<String> listaFechaToma = new ArrayList<>();
+
+        //Lista de profesores
         ArrayList<Profesor> lista = lectura();
+
+        //Map
         Map<String, Integer> mapProfes = new HashMap<>();
         mapProfes = mapear(lista);
 
+        //Contador el cual nos dice los profesores totales que hay
         int contador = 0;
 
         for (Profesor profesor : lista) {
@@ -203,7 +212,39 @@ public class LecturaEscritura {
 
         System.out.println("\n\nHay un total de: " + contador + " profesores");
 
+        //Llamamos al método que escribe el archivo con el map
         escrituraMapeo(mapProfes);
+
+        //Llamamos al método que crea un csv con los profesores que llevan más tiempo
         escrituraListaAntiguedad(lista);
+
+        System.out.println("\n\n\n---------------EJERCICIOS DE LA PRÁCTICA 7.1-------------");
+        //Llamamos al método de utils el cual nos comprueba si hay un trabajador que se llama así
+        System.out.println("¿Algún trabajador se llama Natalia?: "
+                + Utils.hayEmpleado(lista, "Natalia"));
+
+        //Llamamos al método que consulta los coordinadores de un departamento
+        System.out.println("Del departamento de Matemáticas P.E.S. hay un total de: "
+                + Utils.numEmpleadosDepartamento(lista, "Matemáticas P.E.S.") + " Coordinadores");
+
+        //Metemos en la lista el ArrayList resultante del método que busca la letra de dni
+        listaLetraDni = Utils.listaApellidos(lista, 'P');
+        
+        System.out.println("\nLos trabajadores con la letra P en su DNI son: \n");
+        
+        //Recorremos la lista y mostramos el nombre del profesor
+        for (String profesor : listaLetraDni) {
+            System.out.println(profesor);
+        }
+        
+        //Metemos en la lista el ArrayList resultante del método el cual mira la fecha y devuelve el dni
+        listaFechaToma = Utils.comprobarFechaPosesion(lista, LocalDate.of(2006, Month.SEPTEMBER, 1));
+        System.out.println("\nLos trabajadores cuya toma de posesión es el día 01/09/2006 tienen el dni: \n");
+        
+        //Recorremos la lista y la mostramos por pantalla
+        for (String profesor : listaFechaToma) {
+            System.out.println(profesor);
+        }
+
     }
 }
