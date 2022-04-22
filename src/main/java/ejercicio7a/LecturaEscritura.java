@@ -229,18 +229,18 @@ public class LecturaEscritura {
 
         //Metemos en la lista el ArrayList resultante del método que busca la letra de dni
         listaLetraDni = Utils.listaApellidos(lista, 'P');
-        
+
         System.out.println("\nLos trabajadores con la letra P en su DNI son: \n");
-        
+
         //Recorremos la lista y mostramos el nombre del profesor
         for (String profesor : listaLetraDni) {
             System.out.println(profesor);
         }
-        
+
         //Metemos en la lista el ArrayList resultante del método el cual mira la fecha y devuelve el dni
         listaFechaToma = Utils.comprobarFechaPosesion(lista, LocalDate.of(2006, Month.SEPTEMBER, 1));
         System.out.println("\nLos trabajadores cuya toma de posesión es el día 01/09/2006 tienen el dni: \n");
-        
+
         //Recorremos la lista y la mostramos por pantalla
         for (String profesor : listaFechaToma) {
             System.out.println(profesor);
