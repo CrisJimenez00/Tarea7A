@@ -34,19 +34,53 @@ public class LecturaEscritura {
     //Metodo el cual mapea un ArrayList y cuenta los profesores según los departamentos
     private static Map<String, Integer> mapear(ArrayList<Profesor> lista) {
         Map<String, Integer> listaProfesores = new HashMap();
-        int contadorDepartamento = 1;
+        
         for (Profesor profesor : lista) {
             if (listaProfesores.containsKey(profesor.getPuesto())) {
+                int contadorDepartamento = listaProfesores.get(profesor.getPuesto());
                 contadorDepartamento++;
                 listaProfesores.put(profesor.getPuesto(), contadorDepartamento);
             } else {
-                contadorDepartamento = 1;
-                listaProfesores.put(profesor.getPuesto(), contadorDepartamento);
+                listaProfesores.put(profesor.getPuesto(), 1);
 
             }
         }
 
         return listaProfesores;
+    }
+
+    //Método el cual crea un objeto tipo Profesor a partir de un array de tokens
+    private static Profesor crearProfesor(String[] tokens) {
+        Profesor p1 = new Profesor();
+
+        p1.setNombre(comilla(tokens[1]) + " " + tokens[0].substring(1));
+        p1.setDni(comilla(tokens[2]));
+        p1.setPuesto(comilla(tokens[3]));
+
+        String inicio = comilla(tokens[4]);
+        p1.setFechaToma(LocalDate.parse(inicio, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+
+        String fin = comilla(tokens[5]);
+        if (fin.length() <= 0) {
+            p1.setFechaCese(LocalDate.now());
+        } else {
+            p1.setFechaCese(LocalDate.parse(fin, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        }
+
+        p1.setTelf(comilla(tokens[6]));
+
+        if (comilla(tokens[7]).equalsIgnoreCase("no")) {
+            p1.setEvaluador(false);
+        } else {
+            p1.setEvaluador(true);
+        }
+        if (comilla(tokens[8]).equalsIgnoreCase("no")) {
+            p1.setCoordinador(false);
+        } else {
+            p1.setCoordinador(true);
+        }
+        return p1;
+
     }
 
     //Método el cual lee un csv y lo mete en un ArrayList
@@ -76,34 +110,7 @@ public class LecturaEscritura {
                 // Se guarda en el array de String cada elemento de la
                 // línea en función del carácter separador coma
                 tokens = linea.split(",");
-                Profesor p1 = new Profesor();
-
-                p1.setNombre(comilla(tokens[1]) + " " + tokens[0].substring(1));
-                p1.setDni(comilla(tokens[2]));
-                p1.setPuesto(comilla(tokens[3]));
-
-                String inicio = comilla(tokens[4]);
-                p1.setFechaToma(LocalDate.parse(inicio, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-
-                String fin = comilla(tokens[5]);
-                if (fin.length() <= 0) {
-                    p1.setFechaCese(LocalDate.now());
-                } else {
-                    p1.setFechaCese(LocalDate.parse(fin, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-                }
-
-                p1.setTelf(comilla(tokens[6]));
-
-                if (comilla(tokens[7]).equalsIgnoreCase("no")) {
-                    p1.setEvaluador(false);
-                } else {
-                    p1.setEvaluador(true);
-                }
-                if (comilla(tokens[8]).equalsIgnoreCase("no")) {
-                    p1.setCoordinador(false);
-                } else {
-                    p1.setCoordinador(true);
-                }
+                Profesor p1 = crearProfesor(tokens);
                 lista.add(p1);
             }
 
@@ -114,6 +121,7 @@ public class LecturaEscritura {
 
     }
 
+    //Escribe el map en un csv
     private static void escrituraMapeo(Map<String, Integer> listita) {
 
         ArrayList<Profesor> lista = lectura();
