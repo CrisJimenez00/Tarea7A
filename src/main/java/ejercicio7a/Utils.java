@@ -7,6 +7,10 @@ package ejercicio7a;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *
@@ -99,4 +103,32 @@ public class Utils {
 
     }
 
+    public static boolean siHayEmpleadoStream(ArrayList<Profesor> lista, String nombre) {
+        boolean resultado = lista.stream()
+                .anyMatch(p -> p.getNombre().equals(nombre));
+        return resultado;
+    }
+
+    public static long numCoordinadoresStream(ArrayList<Profesor> lista, String departamento) {
+        return lista.stream()
+                .filter(c -> c.isCoordinador())
+                .count();
+    }
+
+    public static ArrayList<String> listaOrdenadaStream(ArrayList<Profesor> lista, String letra) {
+        return (ArrayList<String>) lista.stream()
+                .filter(p -> p.getDni().contains(letra))
+                .map(p -> p.getNombre())
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+    public static ArrayList<String> listaNifStream(ArrayList<Profesor> lista, LocalDate fecha) {
+        return (ArrayList<String>) lista.stream()
+                .filter(profesor -> profesor.getFechaToma().equals(fecha))
+                .map(p -> p.getDni())
+                .sorted(Collections.reverseOrder())
+                .collect(Collectors.toList());
+
+    }
 }

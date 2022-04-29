@@ -26,15 +26,15 @@ import java.util.TreeMap;
 public class LecturaEscritura {
 
     //Método el cual quita las comillas del principio y el final de la palabra
-    private static String comilla(String s) {
+    public static String comilla(String s) {
         String quitar = s.substring(1, s.length() - 1);
         return quitar;
     }
 
     //Metodo el cual mapea un ArrayList y cuenta los profesores según los departamentos
-    private static Map<String, Integer> mapear(ArrayList<Profesor> lista) {
+    public static Map<String, Integer> mapear(ArrayList<Profesor> lista) {
         Map<String, Integer> listaProfesores = new HashMap();
-        
+
         for (Profesor profesor : lista) {
             if (listaProfesores.containsKey(profesor.getPuesto())) {
                 int contadorDepartamento = listaProfesores.get(profesor.getPuesto());
@@ -50,7 +50,7 @@ public class LecturaEscritura {
     }
 
     //Método el cual crea un objeto tipo Profesor a partir de un array de tokens
-    private static Profesor crearProfesor(String[] tokens) {
+    public static Profesor crearProfesor(String[] tokens) {
         Profesor p1 = new Profesor();
 
         p1.setNombre(comilla(tokens[1]) + " " + tokens[0].substring(1));
@@ -84,7 +84,7 @@ public class LecturaEscritura {
     }
 
     //Método el cual lee un csv y lo mete en un ArrayList
-    private static ArrayList<Profesor> lectura() {
+    public static ArrayList<Profesor> lectura() {
         // Fichero a leer con datos de ejemplo
         String idFichero = "RelPerCen.csv";
 
@@ -122,7 +122,7 @@ public class LecturaEscritura {
     }
 
     //Escribe el map en un csv
-    private static void escrituraMapeo(Map<String, Integer> listita) {
+    public static void escrituraMapeo(Map<String, Integer> listita) {
 
         ArrayList<Profesor> lista = lectura();
         listita = new TreeMap<>();
@@ -163,13 +163,12 @@ public class LecturaEscritura {
     }
 
     //Metodo el cual crea el csv de los profesores que llevan más de 100 días trabajando
-    private static void escrituraListaAntiguedad(ArrayList<Profesor> lista) {
+    public static void escrituraListaAntiguedad(ArrayList<Profesor> lista) {
 
         lista = lectura();
         LocalDate fechaini = LocalDate.of(2020, 1, 1);
         LocalDate fechafin = LocalDate.of(2021, 12, 31);
         // Fichero a crear. Ruta relativa a la carpeta raíz del proyecto
-        Scanner teclado = new Scanner(System.in);
         String idFichero = "profesoresAntiguos.csv";
         String tmp;
 
@@ -254,5 +253,24 @@ public class LecturaEscritura {
             System.out.println(profesor);
         }
 
+        System.out.println("\n\n----EJERCICIO DE STREAM-------\n");
+
+        boolean empleado = Utils.siHayEmpleadoStream(lista, "Carlos Rabinovich Camacho");
+        System.out.println("¿Hay empleados que se llamen Carlos Rabinovich Camacho? " + empleado);
+
+        long numCoordinadores = Utils.numCoordinadoresStream(lista, "Matemáticas P.E.S.");
+        System.out.println("\nHay " + numCoordinadores + " coordinadores en el departamento de Matemáticas P.E.S.");
+
+        System.out.println("\nEstos empleados tienen la letra D en su DNI");
+        ArrayList<String> listaOrdenada = Utils.listaOrdenadaStream(lista, "D");
+        for (String string : listaOrdenada) {
+            System.out.println(string);
+        }
+
+        System.out.println("\nEstos son los empleados que tienen como fecha de posesión el 1 de septiembre de 2006");
+        ArrayList<String> listaOrdenadaAlReves = Utils.listaNifStream(lista, LocalDate.of(2006, Month.SEPTEMBER, 1));
+        for (String listaOrdenadaAlReve : listaOrdenadaAlReves) {
+            System.out.println(listaOrdenadaAlReve);
+        }
     }
 }
